@@ -22,7 +22,7 @@ if not os.environ.get("GROQ_API_KEY"):
     raise ValueError("GROQ_API_KEY is missing. Please add it to your .env file: GROQ_API_KEY=your_groq_api_key")
 
 # put the url of the web page you want to load here
-url="https://en.wikipedia.org/wiki/Artificial_intelligence"
+url="https://www.lexisnexis.com/blogs/in-legal/b/law/posts/india-s-three-criminal-laws-key-elements-features"
 loader=WebBaseLoader(url)
 
 # load the documents from the web page
@@ -51,6 +51,9 @@ prompt = ChatPromptTemplate.from_messages([
     ("system", """Provide a concise summary of the text into JSON with this structure:
         {{
             "summary": "summary text here"
+        }},
+        {{
+            "top 3 points": "top 3 points text here and they must be different from summary"
         }}"""),
     ("user", "{input}")
 ])
@@ -67,3 +70,4 @@ def summarize_document(text: str) -> dict:
 description = docs[0].page_content  
 
 summarize_document(description)
+# print(docs[0].page_content)
