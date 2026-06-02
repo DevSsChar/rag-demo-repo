@@ -33,6 +33,9 @@ d:\rag\
 │   └── structure-based/
 │       └── structure_based_splitter.py # Structure-aware splitting
 │
+├── retrievers/                        # Retrieval implementations
+│   └── langchain_retrievers.ipynb     # Various retrieval strategies (Wikipedia, Vector Store, MMR, MultiQuery, Contextual Compression)
+│
 └── rag1/                              # Python virtual environment
     └── ...
 ```
@@ -80,8 +83,8 @@ pip install pypdf
 # For web scraping
 pip install beautifulsoup4
 
-# For semantic splitting
-pip install langchain-experimental langchain-openai
+# For semantic splitting (uses semantic-chunker-langchain instead of deprecated langchain-experimental)
+pip install semantic-chunker-langchain langchain-openai
 
 # For LLM integration
 pip install langchain-groq
@@ -90,8 +93,10 @@ pip install langchain-groq
 Or install all at once:
 
 ```bash
-pip install langchain-community langchain-text-splitters python-dotenv pypdf beautifulsoup4 langchain-experimental langchain-openai langchain-groq
+pip install langchain-community langchain-text-splitters python-dotenv pypdf beautifulsoup4 semantic-chunker-langchain langchain-openai langchain-groq
 ```
+
+**Note:** The project now uses `semantic-chunker-langchain` for semantic splitting, as `langchain-experimental` is deprecated and no longer actively maintained.
 
 ### Environment Configuration
 
@@ -101,6 +106,23 @@ Create a `.env` file in the project root:
 OPENAI_API_KEY=your-openai-key-here
 GROQ_API_KEY=your-groq-key-here
 USER_AGENT=MyRAGApplication/1.0
+```
+
+**⚠️ Security Best Practice:** Never hardcode API keys in your scripts or notebooks. Always use environment variables:
+
+```python
+from dotenv import load_dotenv
+import os
+
+# Load from .env file
+load_dotenv()
+openai_api_key = os.getenv("OPENAI_API_KEY")
+```
+
+Add `.env` to your `.gitignore` to prevent accidentally committing secrets:
+
+```
+.env
 ```
 
 ---
@@ -151,7 +173,7 @@ Text splitters break down large documents into manageable chunks for processing 
 | **Character-based** | [splitters/text_splitter.py](splitters/text_splitter.py) | Quick tests | ⚡⚡⚡ |
 | **Recursive** | [splitters/length-based/](splitters/length-based/) | General purpose | ⚡⚡ |
 | **Document-based** | [splitters/document-based/document.py](splitters/document-based/document.py) | Preserve integrity | ⚡⚡⚡ |
-| **Semantic** | [splitters/semantic-meaning-based/semantic.py](splitters/semantic-meaning-based/semantic.py) | High quality | ⚡ |
+| **Semantic** | [splitters/semantic-meaning-based/semantic.py](splitters/semantic-meaning-based/semantic.py) | High quality (uses semantic-chunker-langchain) | ⚡ |
 | **Structure-based** | [splitters/structure-based/structure_based_splitter.py](splitters/structure-based/structure_based_splitter.py) | Markdown/HTML | ⚡⚡ |
 
 #### Quick Example
@@ -226,7 +248,7 @@ print(f"Total chunks: {len(chunks)}")
 ### Workflow 3: Semantic-Based Chunking
 
 ```python
-from langchain_experimental.text_splitters import SemanticChunker
+from semantic_chunker_langchain.chunker import SemanticChunker
 from langchain_openai.embeddings import OpenAIEmbeddings
 from langchain_community.document_loaders import TextLoader
 from dotenv import load_dotenv
@@ -241,11 +263,11 @@ docs = loader.load()
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 splitter = SemanticChunker(
     embeddings,
-    breakpoint_threshold_type="percentile",
-    breakpoint_threshold_amount=75
+    breakpoint_threshold_type="standard_deviation",
+    breakpoint_threshold_amount=3
 )
 
-chunks = splitter.split_documents(docs)
+chunks = splitter.create_documents([docs[0].page_content])
 print(f"Created {len(chunks)} semantic chunks")
 ```
 
@@ -270,6 +292,22 @@ for i, doc in enumerate(docs[:3]):
 ---
 
 ## Best Practices
+
+### Security
+
+✅ **Do:**
+- Use `.env` files to manage API keys (load with `dotenv`)
+- Never hardcode secrets in code or notebooks
+- Add `.env` to `.gitignore`
+- Use environment variables for all credentials
+- Rotate API keys periodically
+
+❌ **Don't:**
+- Commit `.env` files to version control
+- Hardcode API keys in scripts or notebooks
+- Share code with exposed credentials
+- Use the same API key across projects
+- Log or print sensitive information
 
 ### Data Loading
 
@@ -316,6 +354,18 @@ for i, doc in enumerate(docs[:3]):
 ---
 
 ## Troubleshooting
+
+### Issue: ModuleNotFoundError for SemanticChunker
+
+**Problem:** `ModuleNotFoundError: No module named 'langchain_experimental'` or `No module named 'semantic_chunker_langchain'`
+
+**Solution:**
+```bash
+# Use the new semantic-chunker-langchain package
+pip install semantic-chunker-langchain
+```
+
+The project has migrated from the deprecated `langchain-experimental` to `semantic-chunker-langchain` for semantic splitting.
 
 ### Issue: ModuleNotFoundError
 
@@ -426,12 +476,19 @@ Use these files to test loaders and splitters without external dependencies.
    - Understand trade-offs
    - Optimize for your use case
 
-3. **Build Your Pipeline:**
+3. **Explore Retrievers:** [retrievers/langchain_retrievers.ipynb](retrievers/langchain_retrievers.ipynb)
+   - Wikipedia retriever
+   - Vector store retriever (Chroma, FAISS)
+   - MMR (Maximum Marginal Relevance) search
+   - MultiQuery retriever
+   - Contextual compression retriever
+
+4. **Build Your Pipeline:**
    - Combine loaders and splitters
    - Test with sample data
    - Iterate and optimize
 
-4. **Integrate with Retrieval:**
+5. **Integrate with Retrieval:**
    - Store chunks in vector database
    - Implement similarity search
    - Build complete RAG application
@@ -470,6 +527,7 @@ Quick navigation to key files:
 |-----------|----------|
 | **Loaders Guide** | [loaders/README.md](loaders/README.md) |
 | **Splitters Guide** | [splitters/README.md](splitters/README.md) |
+| **Retrievers Notebook** | [retrievers/langchain_retrievers.ipynb](retrievers/langchain_retrievers.ipynb) |
 | **Text Loader** | [loaders/text_loader.py](loaders/text_loader.py) |
 | **PDF Loader** | [loaders/pdf_loader.py](loaders/pdf_loader.py) |
 | **CSV Loader** | [loaders/csv_loader.py](loaders/csv_loader.py) |
