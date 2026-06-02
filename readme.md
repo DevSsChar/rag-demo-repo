@@ -4,6 +4,21 @@ Welcome to the RAG project! This is a complete implementation guide for building
 
 ---
 
+## 🚀 Live Demo
+
+**Try the YouTube Transcript QA Chatbot:** [https://20caae3a9794d6a625.gradio.live/](https://20caae3a9794d6a625.gradio.live/)
+
+This demo showcases a complete RAG pipeline that:
+- Extracts transcripts from YouTube videos
+- Splits content into semantically meaningful chunks
+- Generates embeddings and stores in vector database (FAISS)
+- Retrieves relevant content based on user queries
+- Uses LLMs (Groq) to generate context-aware answers
+
+Built with the techniques demonstrated in [sample_project/yt_chatbot.ipynb](sample_project/yt_chatbot.ipynb)
+
+---
+
 ## Project Structure
 
 ```
@@ -35,6 +50,9 @@ d:\rag\
 │
 ├── retrievers/                        # Retrieval implementations
 │   └── langchain_retrievers.ipynb     # Various retrieval strategies (Wikipedia, Vector Store, MMR, MultiQuery, Contextual Compression)
+│
+├── sample_project/                    # Complete RAG application example
+│   └── yt_chatbot.ipynb               # YouTube Transcript QA Chatbot (Live Demo)
 │
 └── rag1/                              # Python virtual environment
     └── ...
@@ -88,12 +106,20 @@ pip install semantic-chunker-langchain langchain-openai
 
 # For LLM integration
 pip install langchain-groq
+
+# For local embeddings (used in sample projects)
+pip install langchain-huggingface sentence-transformers
+
+# For YouTube transcript extraction and UI (sample projects)
+pip install youtube-transcript-api gradio
 ```
 
 Or install all at once:
 
 ```bash
-pip install langchain-community langchain-text-splitters python-dotenv pypdf beautifulsoup4 semantic-chunker-langchain langchain-openai langchain-groq
+pip install langchain-community langchain-text-splitters python-dotenv pypdf beautifulsoup4 \
+            semantic-chunker-langchain langchain-openai langchain-groq langchain-huggingface \
+            sentence-transformers youtube-transcript-api gradio faiss-cpu
 ```
 
 **Note:** The project now uses `semantic-chunker-langchain` for semantic splitting, as `langchain-experimental` is deprecated and no longer actively maintained.
@@ -195,7 +221,40 @@ print(f"Created {len(chunks)} chunks")
 
 ---
 
-## Common Workflows
+## 3. Sample Projects
+
+Learn by example with complete, production-ready RAG applications.
+
+**📖 YouTube Transcript QA Chatbot** → [sample_project/yt_chatbot.ipynb](sample_project/yt_chatbot.ipynb)
+
+A complete end-to-end RAG application that answers questions about YouTube video content:
+
+**Features:**
+- 🎬 **Transcript Extraction** — Downloads transcripts directly from YouTube videos
+- 📚 **Smart Chunking** — RecursiveCharacterTextSplitter breaks content into coherent segments
+- 🔍 **Vector Search** — HuggingFace embeddings + FAISS for semantic similarity matching
+- 🤖 **LLM Integration** — Uses Groq's fast inference for real-time responses
+- 💬 **Interactive UI** — Gradio interface for easy question answering
+
+**Quick Workflow:**
+1. Extract YouTube transcript by video ID
+2. Split transcript into chunks (1000 chars with 200 char overlap)
+3. Generate embeddings using BAAI/bge-small-en-v1.5 model
+4. Store embeddings in FAISS vector database
+5. Retrieve relevant chunks for user queries
+6. Generate answers using Groq LLM with context
+
+**Live Demo:** [https://20caae3a9794d6a625.gradio.live/](https://20caae3a9794d6a625.gradio.live/)
+
+**Technologies Used:**
+- `youtube-transcript-api` — Extract video transcripts
+- `langchain-text-splitters` — Document chunking
+- `langchain-huggingface` — Embedding generation
+- `faiss-cpu` — Vector database
+- `langchain-groq` — LLM inference
+- `gradio` — Web UI
+
+---
 
 ### Workflow 1: Load and Split a Text File
 
@@ -528,6 +587,7 @@ Quick navigation to key files:
 | **Loaders Guide** | [loaders/README.md](loaders/README.md) |
 | **Splitters Guide** | [splitters/README.md](splitters/README.md) |
 | **Retrievers Notebook** | [retrievers/langchain_retrievers.ipynb](retrievers/langchain_retrievers.ipynb) |
+| **YouTube QA Chatbot (Demo)** | [sample_project/yt_chatbot.ipynb](sample_project/yt_chatbot.ipynb) |
 | **Text Loader** | [loaders/text_loader.py](loaders/text_loader.py) |
 | **PDF Loader** | [loaders/pdf_loader.py](loaders/pdf_loader.py) |
 | **CSV Loader** | [loaders/csv_loader.py](loaders/csv_loader.py) |
