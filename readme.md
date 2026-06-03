@@ -51,6 +51,10 @@ d:\rag\
 ├── retrievers/                        # Retrieval implementations
 │   └── langchain_retrievers.ipynb     # Various retrieval strategies (Wikipedia, Vector Store, MMR, MultiQuery, Contextual Compression)
 │
+├── agentic_rag/                       # Advanced Agentic RAG implementations
+│   ├── requirements.txt               # Dependencies for agentic RAG
+│   └── agentic_rag_with_langgraph.ipynb # Agentic RAG using LangGraph
+│
 ├── sample_project/                    # Complete RAG application example
 │   └── yt_chatbot.ipynb               # YouTube Transcript QA Chatbot (Live Demo)
 │
@@ -112,6 +116,9 @@ pip install langchain-huggingface sentence-transformers
 
 # For YouTube transcript extraction and UI (sample projects)
 pip install youtube-transcript-api gradio
+
+# For Agentic RAG
+pip install langgraph chromadb
 ```
 
 Or install all at once:
@@ -119,7 +126,7 @@ Or install all at once:
 ```bash
 pip install langchain-community langchain-text-splitters python-dotenv pypdf beautifulsoup4 \
             semantic-chunker-langchain langchain-openai langchain-groq langchain-huggingface \
-            sentence-transformers youtube-transcript-api gradio faiss-cpu
+            sentence-transformers youtube-transcript-api gradio faiss-cpu langgraph chromadb
 ```
 
 **Note:** The project now uses `semantic-chunker-langchain` for semantic splitting, as `langchain-experimental` is deprecated and no longer actively maintained.
@@ -254,6 +261,16 @@ A complete end-to-end RAG application that answers questions about YouTube video
 - `langchain-groq` — LLM inference
 - `gradio` — Web UI
 
+**Agentic RAG with LangGraph** → [agentic_rag/agentic_rag_with_langgraph.ipynb](agentic_rag/agentic_rag_with_langgraph.ipynb)
+
+An advanced RAG implementation that uses LangGraph to create an autonomous agent capable of making decisions about retrieval.
+
+**Features:**
+- **Autonomous Decision Making** — The agent decides when to retrieve information based on the query.
+- **Stateful Workflows** — Uses LangGraph to manage the state of the RAG pipeline.
+- **Conditional Logic** — Implements loops and conditions to determine if retrieved context is sufficient.
+- **Multi-Actor Coordination** — Extends LangChain with the ability to coordinate multiple chains.
+
 ---
 
 ### Workflow 1: Load and Split a Text File
@@ -346,6 +363,38 @@ print(f"Loaded {len(docs)} rows from CSV")
 for i, doc in enumerate(docs[:3]):
     print(f"\nRow {i+1}:")
     print(doc.page_content)
+```
+
+### Workflow 5: Agentic RAG with LangGraph
+
+```python
+from langgraph.graph import StateGraph, END
+from typing import TypedDict, List
+from langchain_core.documents import Document
+
+# Define State
+class AgentState(TypedDict):
+    question: str
+    answer: str
+    documents: List[Document]
+    needs_retrieve: bool
+
+# Define Workflow
+workflow = StateGraph(AgentState)
+
+# Add Nodes
+workflow.add_node("decide", decide_retrieval)
+workflow.add_node("retrieve", retrieve_documents)
+workflow.add_node("generate", generate_answer)
+
+# Set up Edges and Entry Point
+workflow.set_entry_point("decide")
+workflow.add_conditional_edges("decide", should_retrieve, {"retrieve": "retrieve", "generate": "generate"})
+workflow.add_edge("retrieve", "generate")
+workflow.add_edge("generate", END)
+
+# Compile
+app = workflow.compile()
 ```
 
 ---
