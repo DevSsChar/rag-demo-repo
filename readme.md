@@ -117,8 +117,8 @@ pip install langchain-huggingface sentence-transformers
 # For YouTube transcript extraction and UI (sample projects)
 pip install youtube-transcript-api gradio
 
-# For Agentic RAG
-pip install langgraph chromadb
+# For Agentic RAG and Advanced Retrieval
+pip install langgraph chromadb typesense pymupdf
 ```
 
 Or install all at once:
@@ -126,7 +126,8 @@ Or install all at once:
 ```bash
 pip install langchain-community langchain-text-splitters python-dotenv pypdf beautifulsoup4 \
             semantic-chunker-langchain langchain-openai langchain-groq langchain-huggingface \
-            sentence-transformers youtube-transcript-api gradio faiss-cpu langgraph chromadb
+            sentence-transformers youtube-transcript-api gradio faiss-cpu langgraph chromadb \
+            typesense pymupdf
 ```
 
 **Note:** The project now uses `semantic-chunker-langchain` for semantic splitting, as `langchain-experimental` is deprecated and no longer actively maintained.
@@ -679,3 +680,15 @@ For issues or questions:
 **Happy RAG building!** 🚀
 
 Start with the loaders guide → choose your data sources → pick a splitting strategy → build your retrieval system!
+
+---
+
+## Acknowledgments & Credits
+
+This project and the techniques demonstrated within are inspired by the educational content and courses provided by:
+
+- **[Krish Naik](https://github.com/krishnaik06)** — For his extensive tutorials on Generative AI and RAG architectures.
+- **[CampusX](https://github.com/campusx-official)** — For deep dives into machine learning and practical AI implementation strategies.
+- **[IBM](https://www.ibm.com/)** — For their foundational work in AI and best practices in RAG system design.
+
+Special thanks to these creators and organizations for their invaluable contributions to the AI community.
