@@ -1,0 +1,4 @@
+self_rag:
+https://colab.research.google.com/drive/1v5CCd_zarFuWETEj5fZYIE0L_cGvc9fs?usp=sharing
+c_rag:
+https://colab.research.google.com/drive/1-PDpYVIhD6GDilzlpXTQuVD9BmkfDviC?usp=sharing
